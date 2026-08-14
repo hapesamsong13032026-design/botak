@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 """
 ╔═══════════════════════════════════════════════════════════════════════════════╗
-║                     HEARTWOOD MINING BOT - COMPLETE v1.1                      ║
+║                     HEARTWOOD MINING BOT - COMPLETE v1.2                      ║
 ║                                                                               ║
 ║  A comprehensive Python-based object detection bot for Heartwood Online       ║
-║  Mining automation using OpenCV template matching and keyboard simulation     ║
+║  Cotton farming automation using OpenCV template matching and keyboard        ║
+║  simulation                                                                   ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
 
 Author: VrtK
-Version: 1.1
+Version: 1.2
 Python: 3.6+
 OS: Windows (requires ctypes.windll)
 
@@ -22,11 +23,11 @@ Dependencies:
   - tkinter (built-in)
 
 Usage:
-  python bot_complete.py
+  python bot.py
 
 Features:
-  ✓ Automatic coal mining detection
-  ✓ Multi-ore variant support (11 types)
+  ✓ Automatic cotton harvesting detection
+  ✓ Multi-cotton variant support (11 types)
   ✓ Smart character navigation (WASD)
   ✓ Bank management (store/pull)
   ✓ NPC trading automation
@@ -58,7 +59,7 @@ from tkinter import PhotoImage
 
 global Lilian  # Bot active flag
 full_counter = 0  # Bag fullness counter (max 6)
-lifted_coal = 0  # Total coal mined counter
+lifted_cotton = 0  # Total cotton harvested counter
 
 # Window configuration
 WINDOW_TITLE = 'BlueStacks App Player'
@@ -70,24 +71,24 @@ MAIN_SPOT_TEMPLATE = 'MISC/mining/main.JPG'
 DIED_TEMPLATE = 'MISC/game/died.JPG'
 TOWN_TEMPLATE = 'MISC/game/town.JPG'
 NEW_MESSAGE_TEMPLATE = 'MISC/game/new_message.JPG'
-COAL_ONGROUND_TEMPLATE = 'MISC/mining/storage/coal_onground.JPG'
+COTTON_ONGROUND_TEMPLATE = 'MISC/mining/cotton_onground.jpg'
 
 # Template matching thresholds
 THRESHOLD_MINING_ACTION = 0.85
-THRESHOLD_ORE_DETECTION = 0.7
+THRESHOLD_COTTON_DETECTION = 0.7
 THRESHOLD_MAIN_OBJECT = 0.7
 THRESHOLD_MISC = 0.5
 THRESHOLD_TOWN = 0.8
 
 # Movement & distance config
-MAX_DISTANCE_TO_ORE = 650
+MAX_DISTANCE_TO_COTTON = 650
 BAG_FULL_THRESHOLD = 6
 MOVEMENT_DELAY = 0.3  # seconds per key press
 SPECIAL_DISTANCE = 161
 
 # ═════════════════════════════════════════════════════════════════════════════
 # KEYBOARD INPUT HANDLER - Virtual Key Codes
-# ═════════════════════════════════════════════════════════════════════════════
+# ════════════════════════��════════════════════════════════════════════════════
 
 # Key codes (scan codes for Windows)
 W = 0x11  # Forward
@@ -317,7 +318,7 @@ def move_character_towards_object(character_x, character_y, object_center_x,
 
 # ═════════════════════════════════════════════════════════════════════════════
 # OBJECT DETECTION FUNCTIONS
-# ═════════════════════════════════════════════════════════════════════════════
+# ════════════════════════════���════════════════════════════════════════════════
 
 def find_object_in_game(window_title, obj_path):
     """
@@ -359,7 +360,7 @@ def find_object_in_game(window_title, obj_path):
 
 
 # ═════════════════════════════════════════════════════════════════════════════
-# MINING CORE FUNCTION - MAIN BOT LOOP
+# COTTON HARVESTING CORE FUNCTION - MAIN BOT LOOP
 # ═════════════════════════════════════════════════════════════════════════════
 
 def create_live_duplicate(window_title):
@@ -368,17 +369,17 @@ def create_live_duplicate(window_title):
     
     Runs in separate thread. Continuously:
     1. Screenshots game
-    2. Detects mining actions
-    3. Scans for ore
+    2. Detects harvesting actions
+    3. Scans for cotton
     4. Calculates distance
-    5. Navigates to ore
+    5. Navigates to cotton
     6. Checks for errors (died, disconnected)
     7. Updates GUI preview
     
     Args:
         window_title: Target window title
     """
-    global Lilian, lifted_coal
+    global Lilian, lifted_cotton
     import pygetwindow as gw
     
     try:
@@ -395,7 +396,7 @@ def create_live_duplicate(window_title):
         while not target_window.isActive:
             time.sleep(0.5)
         
-        print("✅ Bot started! Begin mining...")
+        print("✅ Bot started! Begin harvesting...")
         
         # INFINITE LOOP
         iteration = 0
@@ -424,7 +425,7 @@ def create_live_duplicate(window_title):
                 continue
             
             # ╔════════════════════════════════════════════╗
-            # ║ STEP 2: Detect Mining Action            ║
+            # ║ STEP 2: Detect Harvesting Action        ║
             # ╚════════════════════════════════════════════╝
             try:
                 mining_template_read = cv2.imread(MINING_TEMPLATE)
@@ -434,20 +435,20 @@ def create_live_duplicate(window_title):
                     mining_min_val, mining_max_val, mining_min_loc, mining_max_loc = cv2.minMaxLoc(obj_mining)
                     
                     if mining_max_val > THRESHOLD_MINING_ACTION:
-                        print(f"⛏️  Found mining action! Confidence: {mining_max_val:.4f}")
+                        print(f"🌾 Found harvest action! Confidence: {mining_max_val:.4f}")
                         action()
-                        lifted_coal += 1
-                        label_lifted_coal.config(text=f'⛏️ Found Coal\n{lifted_coal}')
-                        time.sleep(5)  # Wait for mining animation
+                        lifted_cotton += 1
+                        label_lifted_cotton.config(text=f'🌾 Cotton: {lifted_cotton}')
+                        time.sleep(5)  # Wait for harvest animation
                         continue
             except Exception as e:
-                print(f"⚠️  Mining detection error: {e}")
+                print(f"⚠️  Harvest detection error: {e}")
             
             # ╔════════════════════════════════════════════╗
-            # ║ STEP 3: Scan Ore Templates               ║
+            # ║ STEP 3: Scan Cotton Templates            ║
             # ╚════════════════════════════════════════════╝
-            ore_found = False
-            folder_path = 'MISC/mining/ore'
+            cotton_found = False
+            folder_path = 'MISC/mining/cotton'
             
             try:
                 image_paths = (glob.glob(os.path.join(folder_path, '*.jpg')) + 
@@ -463,11 +464,11 @@ def create_live_duplicate(window_title):
                                                        cv2.TM_CCOEFF_NORMED)
                         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(obj_result)
                         
-                        if max_val > THRESHOLD_ORE_DETECTION:
-                            print(f"🪨 Found Ore! Type: {os.path.basename(image_path)}, "
+                        if max_val > THRESHOLD_COTTON_DETECTION:
+                            print(f"🌾 Found Cotton! Type: {os.path.basename(image_path)}, "
                                   f"Confidence: {max_val:.4f}")
                             
-                            # Calculate ore center
+                            # Calculate cotton center
                             template_width, template_height = template.shape[1], template.shape[0]
                             top_left = max_loc
                             bottom_right = (top_left[0] + template_width, 
@@ -477,8 +478,8 @@ def create_live_duplicate(window_title):
                             cv2.rectangle(screenshot, top_left, bottom_right, (0, 255, 0), 2)
                             
                             # Calculate centroid
-                            ore_object_centroid = (top_left[0] + template_width // 2,
-                                                  top_left[1] + template_height // 2)
+                            cotton_object_centroid = (top_left[0] + template_width // 2,
+                                                     top_left[1] + template_height // 2)
                             object_center_x = top_left[0] + (template_width // 2)
                             object_center_y = top_left[1] + (template_height // 2)
                             
@@ -497,43 +498,43 @@ def create_live_duplicate(window_title):
                                     
                                     if max_val > THRESHOLD_MAIN_OBJECT:
                                         distance = calculate_distance(main_object_centroid, 
-                                                                     ore_object_centroid)
+                                                                     cotton_object_centroid)
                                         
-                                        if distance > MAX_DISTANCE_TO_ORE:
-                                            print(f"📏 Ore too far! Distance: {distance:.2f}px "
-                                                  f"(max: {MAX_DISTANCE_TO_ORE}px)")
+                                        if distance > MAX_DISTANCE_TO_COTTON:
+                                            print(f"📏 Cotton too far! Distance: {distance:.2f}px "
+                                                  f"(max: {MAX_DISTANCE_TO_COTTON}px)")
                                             continue
                                         else:
                                             print(f"📏 Distance: {distance:.2f}px - ACCEPTABLE")
                                             # ╔════════════════════════════════════════════╗
-                                            # ║ STEP 5: Move & Mine                     ║
+                                            # ║ STEP 5: Move & Harvest                  ║
                                             # ╚════════════════════════════════════════════╝
                                             move_character_towards_object(
                                                 character_x, character_y,
                                                 object_center_x, object_center_y,
                                                 distance)
-                                            ore_found = True
+                                            cotton_found = True
                                     else:
-                                        print("❓ Cannot locate main mining spot")
+                                        print("❓ Cannot locate main farming spot")
                                         move_down()
                             except Exception as e:
                                 print(f"⚠️  Main spot detection error: {e}")
                             
-                            break  # Process only first ore found
+                            break  # Process only first cotton found
                     
                     except Exception as e:
-                        print(f"⚠️  Ore processing error: {e}")
+                        print(f"⚠️  Cotton processing error: {e}")
                         continue
             
             except Exception as e:
-                print(f"❌ Ore scanning error: {e}")
+                print(f"❌ Cotton scanning error: {e}")
             
             # ╔════════════════════════════════════════════╗
             # ║ STEP 6: Check Misc Conditions           ║
             # ╚════════════════════════════════════════════╝
             check_for_misc()
             
-            # ╔════���═══════════════════════════════════════╗
+            # ╔═════════════════���══════════════════════════╗
             # ║ STEP 7: Update GUI Preview               ║
             # ╚════════════════════════════════════════════╝
             try:
@@ -560,7 +561,7 @@ def check_for_misc():
     2. Character died
     3. Bag full
     """
-    global full_counter, lifted_coal, Lilian
+    global full_counter, lifted_cotton, Lilian
     
     try:
         # ╔════════════════════════════════════════════╗
@@ -585,7 +586,7 @@ def check_for_misc():
             _, _, val = find_object_in_game(WINDOW_TITLE, DIED_TEMPLATE)
             if val > THRESHOLD_MISC:
                 print("💀 CHARACTER DIED!")
-                telegram(f'💀 DIED! Coal mined: {lifted_coal}')
+                telegram(f'💀 DIED! Cotton harvested: {lifted_cotton}')
                 stop_function()
                 return
         except:
@@ -595,17 +596,17 @@ def check_for_misc():
         # ║ Check: Bag Full                          ║
         # ╚════════════════════════════════════════════╝
         try:
-            _, _, val = find_object_in_game(WINDOW_TITLE, COAL_ONGROUND_TEMPLATE)
+            _, _, val = find_object_in_game(WINDOW_TITLE, COTTON_ONGROUND_TEMPLATE)
             if val > THRESHOLD_MISC:
-                print("🏷️  Coal found on ground - Bag might be full!")
+                print("🏷️  Cotton found on ground - Bag might be full!")
                 full_counter += 1
                 action()  # Try collect
                 
                 if full_counter >= BAG_FULL_THRESHOLD:
                     print("🎉 BAG FULL!")
-                    telegram(f'🎉 BAG FULL! Coal mined: {lifted_coal}')
+                    telegram(f'🎉 BAG FULL! Cotton harvested: {lifted_cotton}')
                     full_counter = 0
-                    lifted_coal = 0
+                    lifted_cotton = 0
                     
                     # Go to town, bank, and return
                     Lilian = False
@@ -614,7 +615,7 @@ def check_for_misc():
                     print("🔙 Returning to spot...")
                     back_to_spot_function()
                     Lilian = True
-                    print("✅ Ready to mine again!")
+                    print("✅ Ready to harvest again!")
         except:
             pass
     
@@ -627,82 +628,82 @@ def check_for_misc():
 # ═════════════════════════════════════════════════════════════════════════════
 
 def store_function():
-    """Store coal from inventory to bank"""
+    """Store cotton from inventory to bank"""
     wait_for_window()
-    print("💾 Starting store coal...")
+    print("💾 Starting store cotton...")
     
     try:
         # First create empty slot
-        x, y, coal_val = find_object_in_game(WINDOW_TITLE, 
-                                             'MISC/mining/storage/coal.JPG')
-        if coal_val > 0.6:
+        x, y, cotton_val = find_object_in_game(WINDOW_TITLE, 
+                                               'MISC/mining/storage/cotton.JPG')
+        if cotton_val > 0.6:
             x_empty, y_empty, _ = find_object_in_game(WINDOW_TITLE, 
                                                       'MISC/mining/storage/empty.JPG')
             drag_and_drop(x + 25, y + 25, x_empty + 25, y_empty + 25)
             
-            x_coal = 1030
+            x_cotton = 1030
             counter = 0
             
             for itemx in range(6):
                 print(f"📦 Store item #{itemx}")
-                x_coal += 70
-                y_coal = 230
+                x_cotton += 70
+                y_cotton = 230
                 
                 for itemy in range(6):
-                    y_coal += 70
-                    drag_and_drop(x_coal, y_coal, x_empty + 25, y_empty + 55)
+                    y_cotton += 70
+                    drag_and_drop(x_cotton, y_cotton, x_empty + 25, y_empty + 55)
                     time.sleep(0.2)
                     counter += 1
                     
                     if counter == 20:
                         x, y, _ = find_object_in_game(WINDOW_TITLE, 
-                                                     'MISC/mining/storage/coal.JPG')
+                                                     'MISC/mining/storage/cotton.JPG')
                         x_empty, y_empty, _ = find_object_in_game(WINDOW_TITLE, 
                                                                   'MISC/mining/storage/empty.JPG')
                         drag_and_drop(x, y, x_empty + 25, y_empty + 25)
                         time.sleep(0.2)
         
-        print("✅ Store coal completed")
+        print("✅ Store cotton completed")
     except Exception as e:
         print(f"❌ Store error: {e}")
 
 
 def pull_function():
-    """Pull coal from bank to inventory"""
+    """Pull cotton from bank to inventory"""
     wait_for_window()
-    print("📥 Pulling coal from bank...")
+    print("📥 Pulling cotton from bank...")
     
     try:
-        x_coal = 1030
+        x_cotton = 1030
         for itemx in range(6):
             print(f"📦 Pull item #{itemx}")
-            x_coal += 70
-            y_coal = 230
+            x_cotton += 70
+            y_cotton = 230
             
             for itemy in range(6):
                 x, y, _ = find_object_in_game(WINDOW_TITLE, 
-                                             'MISC/mining/storage/coal_in_bank.JPG')
-                y_coal += 70
-                drag_and_drop(x + 25, y + 25, x_coal, y_coal)
+                                             'MISC/mining/storage/cotton_in_bank.JPG')
+                y_cotton += 70
+                drag_and_drop(x + 25, y + 25, x_cotton, y_cotton)
                 time.sleep(0.2)
         
-        print("✅ Pull coal completed")
+        print("✅ Pull cotton completed")
     except Exception as e:
         print(f"❌ Pull error: {e}")
 
 
 def trade_function():
-    """Trade/sell coal to NPC"""
+    """Trade/sell cotton to NPC"""
     wait_for_window()
-    print("💰 Trading coal...")
+    print("💰 Trading cotton...")
     
     try:
         x_empty, y_empty, val_trade = find_object_in_game(WINDOW_TITLE, 
                                                           'MISC/mining/storage/trade_title.JPG')
         for item in range(6):
-            x, y, coal_max_val = find_object_in_game(WINDOW_TITLE, 
-                                                    'MISC/mining/storage/coal.JPG')
-            if coal_max_val > 0.9:
+            x, y, cotton_max_val = find_object_in_game(WINDOW_TITLE, 
+                                                       'MISC/mining/storage/cotton.JPG')
+            if cotton_max_val > 0.9:
                 y_empty += 70
                 drag_and_drop(x + 25, y + 25, x_empty, y_empty)
                 time.sleep(0.2)
@@ -713,12 +714,12 @@ def trade_function():
 
 
 def shout_function():
-    """Advertise coal in global chat"""
+    """Advertise cotton in global chat"""
     wait_for_window()
     print("📢 Shouting...")
     
     try:
-        shout_text = '⛏️ SELL COAL 4g - PM ME ⛏️ SELL COAL 4g - PM ME ⛏️'
+        shout_text = '🌾 SELL COTTON 4g - PM ME 🌾 SELL COTTON 4g - PM ME 🌾'
         val_msg = 0
         
         while val_msg < 0.5:
@@ -787,8 +788,8 @@ def town_function(bank=True):
 
 
 def back_to_spot_function():
-    """Navigate back to mining spot"""
-    print("🔙 Returning to mining spot...")
+    """Navigate back to farming spot"""
+    print("🔙 Returning to farming spot...")
     
     try:
         for _ in range(13):
@@ -800,7 +801,7 @@ def back_to_spot_function():
         for _ in range(20):
             move_down()
         
-        print("✅ Returned to mining spot")
+        print("✅ Returned to farming spot")
     
     except Exception as e:
         print(f"❌ Navigation error: {e}")
@@ -808,7 +809,7 @@ def back_to_spot_function():
 
 # ═════════════════════════════════════════════════════════════════════════════
 # GUI FUNCTIONS
-# ═════════════════════════════════════════════════════════════════════════════
+# ════════════════════════════════���════════════════════════════════════════════
 
 class RedirectText:
     """Redirect stdout to Tkinter Text widget with timestamps"""
@@ -918,9 +919,9 @@ if __name__ == "__main__":
     
     # ╔════════════════════════════════════════════╗
     # ║ Create Tkinter Window                    ║
-    # ╚══════════════════════════════════���═════════╝
+    # ╚════════════════════════════════════════════╝
     root = tk.Tk()
-    root.title("🎮 Heartwood Mining Bot v1.1")
+    root.title("🎮 Heartwood Farming Bot v1.2")
     root.geometry("305x600+0+0")
     root.attributes("-topmost", True)
     root.wm_attributes('-toolwindow', 1)
@@ -978,24 +979,24 @@ if __name__ == "__main__":
     image_label = tk.Label(root, bg='#1e1e1e')
     image_label.grid(row=2, column=0, columnspan=2, padx=0, pady=5)
     
-    # ╔════════════════════════════════════════════╗
-    # ║ Create Coal Counter Label                ║
+    # ╔════════════════════════════════════════��═══╗
+    # ║ Create Cotton Counter Label              ║
     # ╚════════════════════════════════════════════╝
-    label_lifted_coal = tk.Label(root, text="⛏️ Coal: 0", fg="#00ff00", bg='#2b2b2b',
-                                 font=('Arial', 12, 'bold'))
-    label_lifted_coal.grid(row=0, column=0, columnspan=2, padx=0, pady=5)
+    label_lifted_cotton = tk.Label(root, text="🌾 Cotton: 0", fg="#00ff00", bg='#2b2b2b',
+                                   font=('Arial', 12, 'bold'))
+    label_lifted_cotton.grid(row=0, column=0, columnspan=2, padx=0, pady=5)
     
     # ╔════════════════════════════════════════════╗
     # ║ Initial Setup                            ║
     # ╚════════════════════════════════════════════╝
     print('╔════════════════════════════════════════╗')
-    print('║  🎮 HEARTWOOD MINING BOT v1.1        ║')
-    print('║  Ready to mine!                       ║')
+    print('║  🎮 HEARTWOOD FARMING BOT v1.2       ║')
+    print('║  Ready to harvest!                    ║')
     print('╚════════════════════════════════════════╝')
     print(f'Configuration:')
     print(f'  Window: {WINDOW_TITLE}')
     print(f'  Resolution: {EMULATOR_RESOLUTION}')
-    print(f'  Max Distance: {MAX_DISTANCE_TO_ORE}px')
+    print(f'  Max Distance: {MAX_DISTANCE_TO_COTTON}px')
     print(f'  Bag Capacity: {BAG_FULL_THRESHOLD} items')
     print('')
     
