@@ -71,7 +71,7 @@ MAIN_SPOT_TEMPLATE = 'MISC/mining/main.JPG'
 DIED_TEMPLATE = 'MISC/game/died.JPG'
 TOWN_TEMPLATE = 'MISC/game/town.JPG'
 NEW_MESSAGE_TEMPLATE = 'MISC/game/new_message.JPG'
-COTTON_ONGROUND_TEMPLATE = 'MISC/mining/cotton_onground.jpg'
+COTTON_ONGROUND_TEMPLATE = 'MISC/mining/storage/cotton_onground.jpg'
 
 # Template matching thresholds
 THRESHOLD_MINING_ACTION = 0.85
@@ -88,7 +88,7 @@ SPECIAL_DISTANCE = 161
 
 # ═════════════════════════════════════════════════════════════════════════════
 # KEYBOARD INPUT HANDLER - Virtual Key Codes
-# ════════════════════════��════════════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════════════════════
 
 # Key codes (scan codes for Windows)
 W = 0x11  # Forward
@@ -248,7 +248,7 @@ def drag_and_drop(start_x, start_y, end_x, end_y):
     pyautogui.mouseUp()
 
 
-# ═════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════���═══════════════════════════════════════
 # UTILITY FUNCTIONS
 # ═════════════════════════════════════════════════════════════════════════════
 
@@ -318,7 +318,7 @@ def move_character_towards_object(character_x, character_y, object_center_x,
 
 # ═════════════════════════════════════════════════════════════════════════════
 # OBJECT DETECTION FUNCTIONS
-# ════════════════════════════���════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 
 def find_object_in_game(window_title, obj_path):
     """
@@ -534,7 +534,7 @@ def create_live_duplicate(window_title):
             # ╚════════════════════════════════════════════╝
             check_for_misc()
             
-            # ╔═════════════════���══════════════════════════╗
+            # ╔════════════════════════════════════════════╗
             # ║ STEP 7: Update GUI Preview               ║
             # ╚════════════════════════════════════════════╝
             try:
@@ -635,7 +635,7 @@ def store_function():
     try:
         # First create empty slot
         x, y, cotton_val = find_object_in_game(WINDOW_TITLE, 
-                                               'MISC/mining/storage/cotton.JPG')
+                                               'MISC/mining/storage/cotton.jpg')
         if cotton_val > 0.6:
             x_empty, y_empty, _ = find_object_in_game(WINDOW_TITLE, 
                                                       'MISC/mining/storage/empty.JPG')
@@ -657,7 +657,7 @@ def store_function():
                     
                     if counter == 20:
                         x, y, _ = find_object_in_game(WINDOW_TITLE, 
-                                                     'MISC/mining/storage/cotton.JPG')
+                                                     'MISC/mining/storage/cotton.jpg')
                         x_empty, y_empty, _ = find_object_in_game(WINDOW_TITLE, 
                                                                   'MISC/mining/storage/empty.JPG')
                         drag_and_drop(x, y, x_empty + 25, y_empty + 25)
@@ -682,7 +682,7 @@ def pull_function():
             
             for itemy in range(6):
                 x, y, _ = find_object_in_game(WINDOW_TITLE, 
-                                             'MISC/mining/storage/cotton_in_bank.JPG')
+                                             'MISC/mining/storage/cotton_in_bank.jpg')
                 y_cotton += 70
                 drag_and_drop(x + 25, y + 25, x_cotton, y_cotton)
                 time.sleep(0.2)
@@ -702,7 +702,7 @@ def trade_function():
                                                           'MISC/mining/storage/trade_title.JPG')
         for item in range(6):
             x, y, cotton_max_val = find_object_in_game(WINDOW_TITLE, 
-                                                       'MISC/mining/storage/cotton.JPG')
+                                                       'MISC/mining/storage/cotton.jpg')
             if cotton_max_val > 0.9:
                 y_empty += 70
                 drag_and_drop(x + 25, y + 25, x_empty, y_empty)
@@ -809,7 +809,7 @@ def back_to_spot_function():
 
 # ═════════════════════════════════════════════════════════════════════════════
 # GUI FUNCTIONS
-# ════════════════════════════════���════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 
 class RedirectText:
     """Redirect stdout to Tkinter Text widget with timestamps"""
@@ -979,7 +979,7 @@ if __name__ == "__main__":
     image_label = tk.Label(root, bg='#1e1e1e')
     image_label.grid(row=2, column=0, columnspan=2, padx=0, pady=5)
     
-    # ╔════════════════════════════════════════��═══╗
+    # ╔════════════════════════════════════════════╗
     # ║ Create Cotton Counter Label              ║
     # ╚════════════════════════════════════════════╝
     label_lifted_cotton = tk.Label(root, text="🌾 Cotton: 0", fg="#00ff00", bg='#2b2b2b',
